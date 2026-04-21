@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life OS — Faizy</title>
+<link rel="stylesheet" href="style.css">
+<!-- Firebase SDK -->
+<script type="module" src="firebase.js"></script>
+</head>
+<body>
+
+<!-- ============================================================
+  HOME SCREEN
+  Edit: nothing here unless you want to change the home layout
+============================================================ -->
+<div id="homeScreen">
+  <div class="home-top">
+    <div class="home-logo">Life OS · Personal System</div>
+    <div class="home-title">LIFE<br><span>OS</span></div>
+    <div class="home-sub">"Discipline. Faith. Financial Freedom. One day at a time."</div>
+    <div class="home-day-tag" id="home-dayTag">DAY 1 OF 90</div>
+  </div>
+  <div class="home-modules">
+    <div class="mod-card mod-personal" onclick="openModule('personal')">
+      <div class="mod-icon">🏃</div>
+      <div class="mod-name">Personal OS</div>
+      <div class="mod-desc">Habits · Prayers · Schedule · Gym · Hygiene · Journal · Goals · Progress</div>
+      <div class="mod-stats">
+        <div class="mod-stat"><div class="mod-stat-num" id="h-streak">0</div><div class="mod-stat-label">CLEAN DAYS</div></div>
+        <div class="mod-stat"><div class="mod-stat-num" id="h-prayers">0/5</div><div class="mod-stat-label">PRAYERS</div></div>
+        <div class="mod-stat"><div class="mod-stat-num" id="h-score">0%</div><div class="mod-stat-label">TODAY</div></div>
+      </div>
+      <div class="mod-arrow">›</div>
+    </div>
+    <div class="mod-card mod-finance" onclick="openModule('finance')">
+      <div class="mod-icon">💰</div>
+      <div class="mod-name">Finance OS</div>
+      <div class="mod-desc">Income · Expenses · Debt · Credit Card · Assets · Net Worth · Reports</div>
+      <div class="mod-stats">
+        <div class="mod-stat"><div class="mod-stat-num" id="h-balance" style="color:#4dff91">0</div><div class="mod-stat-label">BALANCE</div></div>
+        <div class="mod-stat"><div class="mod-stat-num" id="h-debt" style="color:#ff6b6b">20k</div><div class="mod-stat-label">CC DEBT</div></div>
+        <div class="mod-stat"><div class="mod-stat-num" id="h-saved" style="color:#ffd700">0</div><div class="mod-stat-label">SAVED</div></div>
+      </div>
+      <div class="mod-arrow">›</div>
+    </div>
+  </div>
+  <div class="home-quote" id="homeQuote">Loading your daily message…</div>
+</div>
+
+<!-- ============================================================
+  APP SHELL
+  Contains: topbar, sidebar (desktop), drawer (mobile), main area
+============================================================ -->
+<div id="appShell">
+
+  <!-- SIDEBAR — desktop only -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-text">LIFE<span>OS</span></div>
+      <div class="sidebar-logo-sub">Faizy · Dubai</div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="sidebar-avatar">F</div>
+      <div>
+        <div class="sidebar-name">Faizy</div>
+        <div class="sidebar-sub">IT Support · Age 35</div>
+        <div id="syncBadge" class="sync-badge">🟡 Connecting…</div>
+      </div>
+    </div>
+
+    <!-- Personal nav links -->
+    <div id="sidebarPersonal" class="nav-group-wrap">
+      <div class="nav-group-label">Personal OS</div>
+      <div class="nav-item active" id="snav-p-today"     onclick="navTo('p-today')">    <span class="ni">🏠</span> Today</div>
+      <div class="nav-item"        id="snav-p-profile"   onclick="navTo('p-profile')">  <span class="ni">👤</span> Profile & Goals</div>
+      <div class="nav-item"        id="snav-p-schedule"  onclick="navTo('p-schedule')"> <span class="ni">⏰</span> Schedule</div>
+      <div class="nav-item"        id="snav-p-growth"    onclick="navTo('p-growth')">   <span class="ni">💪</span> Growth</div>
+      <div class="nav-item"        id="snav-p-hygiene"   onclick="navTo('p-hygiene')">  <span class="ni">🧴</span> Hygiene</div>
+      <div class="nav-item"        id="snav-p-cleanup"   onclick="navTo('p-cleanup')">  <span class="ni">✨</span> Cleanup</div>
+      <div class="nav-item"        id="snav-p-journal"   onclick="navTo('p-journal')">  <span class="ni">✍️</span> Journal</div>
+      <div class="nav-item"        id="snav-p-progress"  onclick="navTo('p-progress')"> <span class="ni">📈</span> Progress</div>
+    </div>
+
+    <!-- Finance nav links -->
+    <div id="sidebarFinance" class="nav-group-wrap" style="display:none">
+      <div class="nav-group-label">Finance OS</div>
+      <div class="nav-item active" id="snav-f-overview"  onclick="navTo('f-overview')"> <span class="ni">💰</span> Overview</div>
+      <div class="nav-item"        id="snav-f-expenses"  onclick="navTo('f-expenses')"> <span class="ni">💸</span> Expenses</div>
+      <div class="nav-item"        id="snav-f-debt"      onclick="navTo('f-debt')">     <span class="ni">💳</span> Debt & Credit</div>
+      <div class="nav-item"        id="snav-f-savings"   onclick="navTo('f-savings')">  <span class="ni">🏦</span> Savings</div>
+      <div class="nav-item"        id="snav-f-networth"  onclick="navTo('f-networth')"> <span class="ni">📊</span> Net Worth</div>
+      <div class="nav-item"        id="snav-f-reports"   onclick="navTo('f-reports')">  <span class="ni">📄</span> Reports</div>
+    </div>
+
+    <div class="sidebar-footer" onclick="goHome()">🏠 Home Screen</div>
+  </nav>
+
+  <!-- TOPBAR -->
+  <header id="topBar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="openDrawer()">☰</button>
+      <div>
+        <div class="topbar-title">LIFE OS</div>
+        <div class="topbar-page" id="topBarPage">Today</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div id="syncDot" class="sync-dot">🟡 Connecting…</div>
+      <div class="topbar-date" id="topBarDate"></div>
+    </div>
+  </header>
+
+  <!-- MOBILE DRAWER -->
+  <div id="mobileDrawer">
+    <div class="sidebar-logo" style="padding:20px 20px 12px">
+      <div class="sidebar-logo-text">LIFE<span>OS</span></div>
+      <div class="sidebar-logo-sub">Faizy · Dubai</div>
+    </div>
+    <div id="drawerPersonal" class="nav-group-wrap">
+      <div class="nav-group-label">Personal OS</div>
+      <div class="nav-item" onclick="navTo('p-today');   closeDrawer()"><span class="ni">🏠</span> Today</div>
+      <div class="nav-item" onclick="navTo('p-profile'); closeDrawer()"><span class="ni">👤</span> Profile & Goals</div>
+      <div class="nav-item" onclick="navTo('p-schedule');closeDrawer()"><span class="ni">⏰</span> Schedule</div>
+      <div class="nav-item" onclick="navTo('p-growth');  closeDrawer()"><span class="ni">💪</span> Growth</div>
+      <div class="nav-item" onclick="navTo('p-hygiene'); closeDrawer()"><span class="ni">🧴</span> Hygiene</div>
+      <div class="nav-item" onclick="navTo('p-cleanup'); closeDrawer()"><span class="ni">✨</span> Cleanup</div>
+      <div class="nav-item" onclick="navTo('p-journal'); closeDrawer()"><span class="ni">✍️</span> Journal</div>
+      <div class="nav-item" onclick="navTo('p-progress');closeDrawer()"><span class="ni">📈</span> Progress</div>
+    </div>
+    <div id="drawerFinance" class="nav-group-wrap" style="display:none">
+      <div class="nav-group-label">Finance OS</div>
+      <div class="nav-item" onclick="navTo('f-overview'); closeDrawer()"><span class="ni">💰</span> Overview</div>
+      <div class="nav-item" onclick="navTo('f-expenses'); closeDrawer()"><span class="ni">💸</span> Expenses</div>
+      <div class="nav-item" onclick="navTo('f-debt');     closeDrawer()"><span class="ni">💳</span> Debt & Credit</div>
+      <div class="nav-item" onclick="navTo('f-savings');  closeDrawer()"><span class="ni">🏦</span> Savings</div>
+      <div class="nav-item" onclick="navTo('f-networth'); closeDrawer()"><span class="ni">📊</span> Net Worth</div>
+      <div class="nav-item" onclick="navTo('f-reports');  closeDrawer()"><span class="ni">📄</span> Reports</div>
+    </div>
+    <div class="sidebar-footer" onclick="goHome();closeDrawer()">🏠 Home Screen</div>
+  </div>
+  <div id="drawerOverlay" onclick="closeDrawer()"></div>
+
+  <!-- MAIN CONTENT AREA — pages injected here by JS -->
+  <main id="mainArea"></main>
+
+  <!-- MOBILE BOTTOM NAV — built by JS -->
+  <nav id="mobileNav"></nav>
+
+</div><!-- end appShell -->
+
+<!-- ============================================================
+  SCRIPTS — load order matters
+  1. firebase.js  (already loaded as module above)
+  2. personal.js  (Personal OS pages + logic)
+  3. finance.js   (Finance OS pages + logic)
+  4. reports.js   (CSV + PDF downloads)
+  5. app.js       (navigation + init — loads last)
+============================================================ -->
+<script src="personal.js"></script>
+<script src="finance.js"></script>
+<script src="reports.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
