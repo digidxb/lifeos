@@ -9,7 +9,7 @@
 // Edit these if your details change
 const CFG = {
   name:       'Faizy',
-  startDate:  '2025-04-21',   // your 90-day start
+  startDate:  '2026-04-21',   // your 90-day start — TODAY
   dob:        '1991-04-09',
   salary:     8300,
   ccDefault:  20000,
@@ -249,6 +249,7 @@ window.toggleAcc = function(header) {
 };
 
 // ── DATE INIT ──
+// Called AFTER pages are injected so elements exist in DOM
 function initDate() {
   const now  = new Date();
   const diff = daysSinceStart();
@@ -256,29 +257,54 @@ function initDate() {
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-  set('topBarDate',    now.toLocaleDateString('en-GB', opts));
-  set('home-dayTag',   'DAY ' + diff + ' OF 90');
-  set('journalDateLabel', now.toLocaleDateString('en-GB', opts));
+  // e.g. "Tuesday, 21 April 2026"
+  set('topBarDate', now.toLocaleDateString('en-GB', opts));
 
-  // daily quote
-  const q  = QUOTES[now.getDate() % QUOTES.length];
+  // full date in hero + journal
+  const fullDate = now.toLocaleDateString('en-GB', opts); // "Tuesday, 21 April 2026"
+  set('journalDateLabel', fullDate);
+  set('p-heroDate',       fullDate);
+  set('home-dayTag',      'DAY ' + diff + ' OF 90');
+  set('journalDateLabel', now.toLocaleDateString('en-GB', opts));
+  set('p-dayNum',         diff);
+
+  // daily quote — index by day of month
+  const q = QUOTES[now.getDate() % QUOTES.length];
   set('p-heroQuote', '"' + q.text + '"');
   set('p-heroSrc',   '— ' + q.src);
   set('homeQuote',   '"' + q.text + '" — ' + q.src);
 }
 
+// ── FONT FALLBACK ──
+// If Google Fonts fails to load, inject system fallback so Bebas Neue titles still look bold
+function applyFontFallback() {
+  const testEl = document.createElement('span');
+  testEl.style.cssText = 'font-family:"Bebas Neue";font-size:72px;visibility:hidden;position:absolute;';
+  testEl.textContent = 'X';
+  document.body.appendChild(testEl);
+  const w = testEl.offsetWidth;
+  document.body.removeChild(testEl);
+  // if width is same as serif fallback, font didn't load — patch CSS
+  if (w < 30) {
+    const style = document.createElement('style');
+    style.textContent = `.bebas,.hero-name,.home-title,.topbar-title,.life-score,.streak-num,.sbox-num,.ring-pct,.prof-name { font-family: Impact, "Arial Black", sans-serif !important; letter-spacing: 1px; }`;
+    document.head.appendChild(style);
+  }
+}
+
 // ── INIT ──
-// Called once on page load
-// Calls init functions from personal.js and finance.js
 document.addEventListener('DOMContentLoaded', function() {
+  // 1. inject pages first (personal.js + finance.js)
+  if (window.initPersonal) initPersonal();
+  if (window.initFinance)  initFinance();
+
+  // 2. now set dates + quotes (elements exist now)
   initDate();
 
-  // personal init (defined in personal.js)
-  if (window.initPersonal) initPersonal();
-
-  // finance init (defined in finance.js)
-  if (window.initFinance) initFinance();
-
+  // 3. stats + score
   updateHomeStats();
   saveDayScore();
+
+  // 4. font check after short delay
+  setTimeout(applyFontFallback, 1500);
 });

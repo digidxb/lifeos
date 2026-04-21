@@ -90,6 +90,7 @@ function buildTodayPage() {
       <div class="tc"><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="p-heroWins">0</div><div style="font-size:9px;color:rgba(255,255,255,.35);font-family:'DM Mono',monospace;">WINS</div></div>
       <div class="tc"><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="p-heroHabits">0/10</div><div style="font-size:9px;color:rgba(255,255,255,.35);font-family:'DM Mono',monospace;">HABITS</div></div>
     </div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.35);margin-bottom:12px;letter-spacing:1px;" id="p-heroDate"></div>
     <div class="hero-quote" id="p-heroQuote">Loading…</div>
     <div class="hero-quote-src" id="p-heroSrc">— Your Mentor</div>
   </div>
